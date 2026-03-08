@@ -3,3 +3,9 @@ dist/
 .env
 *.log
 .DS_Store
+
+# Generated audio (regeneratable; keeps repo small)
+**/generated/
+
+# Per-project voice config (copy from voices.json.example and add your ElevenLabs voice IDs)
+**/voices.json
