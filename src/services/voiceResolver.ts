@@ -1,36 +1,32 @@
 import { readFile } from "node:fs/promises";
 import { getVoicesJsonPath } from "../utils/paths.js";
+import { voicesJsonSchema, type VoiceEntry, type VoicesMap } from "../schemas/voicesJson.js";
 
-export interface VoiceEntry {
-  voiceId: string;
-  displayName?: string;
-}
-
-export type VoicesMap = Record<string, VoiceEntry>;
+export type { VoiceEntry, VoicesMap };
 
 /**
  * Load and parse projects/<projectId>/voices.json.
- * @throws if file is missing or invalid JSON
+ * @throws if file is missing, invalid JSON, or fails Zod validation
  */
 export async function loadVoices(projectId: string): Promise<VoicesMap> {
   const voicesPath = getVoicesJsonPath(projectId);
   const raw = await readFile(voicesPath, "utf-8");
-  const data = JSON.parse(raw) as unknown;
+  let data: unknown;
+  try {
+    data = JSON.parse(raw);
+  } catch (err) {
+    throw new Error("voices.json is not valid JSON");
+  }
   if (data === null || typeof data !== "object" || Array.isArray(data)) {
     throw new Error("voices.json must be an object");
   }
-  const map: VoicesMap = {};
-  for (const [label, entry] of Object.entries(data)) {
-    if (
-      entry !== null &&
-      typeof entry === "object" &&
-      "voiceId" in entry &&
-      typeof (entry as VoiceEntry).voiceId === "string"
-    ) {
-      map[label] = entry as VoiceEntry;
-    }
+  const result = voicesJsonSchema.safeParse(data);
+  if (!result.success) {
+    const first = result.error.errors[0];
+    const path = first?.path?.length ? first.path.join(".") : "root";
+    throw new Error(`voices.json validation failed at ${path}: ${first?.message ?? "invalid structure"}`);
   }
-  return map;
+  return result.data;
 }
 
 /**

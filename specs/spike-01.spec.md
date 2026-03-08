@@ -217,8 +217,8 @@ POST /generate-dialogue-line
 
 ### Field rules
 
-* `projectId`: required, string, non-empty
-* `sectionId`: required, string, non-empty
+* `projectId`: required, slug (lowercase letters, digits, hyphens only; e.g. `demo-project`)
+* `sectionId`: required, slug (same format; e.g. `intro-scene`)
 * `voice`: required, string, non-empty
 * `text`: required, string, non-empty
 
@@ -247,9 +247,9 @@ Body:
   "projectId": "demo-project",
   "sectionId": "intro-scene",
   "voice": "doctor",
-  "filename": "001-doctor.wav",
-  "relativePath": "generated/dialogue/intro-scene/001-doctor.wav",
-  "absolutePath": "/absolute/path/to/projects/demo-project/generated/dialogue/intro-scene/001-doctor.wav",
+  "filename": "001-doctor.mp3",
+  "relativePath": "generated/dialogue/intro-scene/001-doctor.mp3",
+  "absolutePath": "/absolute/path/to/projects/demo-project/generated/dialogue/intro-scene/001-doctor.mp3",
   "text": "[thoughtful] I thought there might something like this going on..."
 }
 ```
@@ -323,7 +323,7 @@ projects/<projectId>/generated/dialogue/<sectionId>/
 ### Example
 
 ```text
-projects/demo-project/generated/dialogue/intro-scene/001-doctor.wav
+projects/demo-project/generated/dialogue/intro-scene/001-doctor.mp3
 ```
 
 ### File naming
@@ -331,16 +331,16 @@ projects/demo-project/generated/dialogue/intro-scene/001-doctor.wav
 For this spike, use deterministic incrementing names per section:
 
 ```text
-001-doctor.wav
-002-naz.wav
-003-doctor.wav
+001-doctor.mp3
+002-naz.mp3
+003-doctor.mp3
 ```
 
 ### Naming rules
 
 * zero-padded numeric prefix
 * kebab-case/safe filename version of the `voice` label
-* always save as `.wav` if the upstream format is configured as WAV
+* file extension matches upstream API output (e.g. `.mp3` for default ElevenLabs format)
 
 ### Counter behavior
 
@@ -412,12 +412,12 @@ Use **Zod** for request body validation.
 
 ### Request schema requirements
 
-* `projectId`: `z.string().min(1)`
-* `sectionId`: `z.string().min(1)`
+* `projectId`: strict slug (e.g. `z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/)`)
+* `sectionId`: strict slug (same)
 * `voice`: `z.string().min(1)`
 * `text`: `z.string().min(1)`
 
-Return `400` on validation failure.
+Return `400` on validation failure. `GET /projects/:projectId/voices` validates `projectId` as a slug in params. `voices.json` is validated with Zod when loaded (object of voice labels to `{ voiceId, displayName? }`).
 
 ---
 
@@ -567,7 +567,7 @@ Implement:
 * local voice resolution from `projects/<projectId>/voices.json`
 * an ElevenLabs service wrapper that calls text-to-speech for one line of text
 * file saving to `projects/<projectId>/generated/dialogue/<sectionId>/`
-* deterministic incrementing filenames like `001-doctor.wav`
+* deterministic incrementing filenames like `001-doctor.mp3`
 * JSON success and error responses as described in the spec
 * a sample `projects/demo-project/voices.json`
 * a README with setup instructions

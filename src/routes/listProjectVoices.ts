@@ -1,5 +1,6 @@
 import { FastifyPluginAsync } from "fastify";
 import { existsSync } from "node:fs";
+import { projectIdParamSchema } from "../schemas/slugs.js";
 import { loadVoices } from "../services/voiceResolver.js";
 import { getProjectDir } from "../utils/paths.js";
 import { apiError } from "../utils/errors.js";
@@ -8,7 +9,21 @@ export const listProjectVoicesRoute: FastifyPluginAsync = async (app) => {
   app.get<{
     Params: { projectId: string };
   }>("/projects/:projectId/voices", async (request, reply) => {
-    const { projectId } = request.params;
+    const paramsResult = projectIdParamSchema.safeParse(request.params);
+    if (!paramsResult.success) {
+      request.log.info(
+        { validation: paramsResult.error.flatten() },
+        "Params validation failed"
+      );
+      return reply.status(400).send(
+        apiError(
+          "INVALID_REQUEST",
+          paramsResult.error.errors.map((e) => e.message).join("; ") ||
+            "Invalid projectId"
+        )
+      );
+    }
+    const { projectId } = paramsResult.data;
 
     const projectDir = getProjectDir(projectId);
     if (!existsSync(projectDir)) {

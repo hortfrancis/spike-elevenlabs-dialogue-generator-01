@@ -6,7 +6,7 @@ Local-only Node + TypeScript backend spike that wraps the ElevenLabs text-to-spe
 
 ## What it does
 
-- **POST /generate-dialogue-line** — accepts `projectId`, `sectionId`, `voice`, and `text`. Resolves `voice` to an ElevenLabs `voiceId` via `projects/<projectId>/voices.json`, calls the ElevenLabs API, and saves the returned audio to `projects/<projectId>/generated/dialogue/<sectionId>/` with deterministic names like `001-doctor.wav`. Returns JSON metadata (filename, paths, etc.) on success, or a structured JSON error with an appropriate HTTP status on failure.
+- **POST /generate-dialogue-line** — accepts `projectId`, `sectionId`, `voice`, and `text`. Resolves `voice` to an ElevenLabs `voiceId` via `projects/<projectId>/voices.json`, calls the ElevenLabs API, and saves the returned audio to `projects/<projectId>/generated/dialogue/<sectionId>/` with deterministic names like `001-doctor.mp3`. Returns JSON metadata (filename, paths, etc.) on success, or a structured JSON error with an appropriate HTTP status on failure.
 
 ## Install
 
@@ -39,7 +39,7 @@ Each project has a `voices.json` that maps human-friendly labels to ElevenLabs v
    ```
 2. Edit `projects/demo-project/voices.json` and replace the placeholder voice IDs with your ElevenLabs voice IDs (from the [ElevenLabs Voice Library](https://elevenlabs.io/voice-library) or your account).
 
-**Format of `voices.json`:**
+**Format of `voices.json`:** The file is validated with Zod. Top level is an object; each key is a voice label (non-empty string), each value must have `voiceId` (non-empty string) and may have optional `displayName`.
 
 ```json
 {
@@ -81,16 +81,17 @@ Other scripts:
 - **Unknown voice:** Set `voice` to `"unknown"` → expect **400** and error code `UNKNOWN_VOICE`.
 - **Empty text:** Set `text` to `""` → expect **400** and `INVALID_REQUEST`.
 - **Bad project:** Use a non-existent `projectId` or omit required fields → expect **400** (`UNKNOWN_PROJECT` or `INVALID_REQUEST`).
+- **Invalid slug:** Use `projectId` or `sectionId` with invalid characters (e.g. spaces, uppercase) → expect **400** and `INVALID_REQUEST`. Both must be slugs: lowercase letters, digits, and hyphens only (e.g. `demo-project`, `intro-scene`).
 
 ## Where files are saved
 
 Generated audio is written to:
 
 ```text
-projects/<projectId>/generated/dialogue/<sectionId>/<NNN>-<voice>.wav
+projects/<projectId>/generated/dialogue/<sectionId>/<NNN>-<voice>.mp3
 ```
 
-Example: `projects/demo-project/generated/dialogue/intro-scene/001-doctor.wav`. The numeric prefix increments per section so existing files are not overwritten.
+Example: `projects/demo-project/generated/dialogue/intro-scene/001-doctor.mp3`. The numeric prefix increments per section so existing files are not overwritten. The file extension (e.g. `.mp3`) matches the upstream API output format.
 
 ## Error responses
 
