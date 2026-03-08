@@ -1,0 +1,41 @@
+meta {
+  name: Generate dialogue line
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:3001/generate-dialogue-line
+  body: json
+  auth: none
+}
+
+body:json {
+  "projectId": "demo-project",
+  "sectionId": "intro-scene",
+  "voice": "doctor",
+  "text": "[thoughtful] I thought there might something like this going on..."
+}
+
+docs {
+  # Generate dialogue line
+
+  ## Success case
+  - projectId: demo-project
+  - sectionId: intro-scene
+  - voice: doctor (or naz)
+  - text: non-empty (can include cues like [thoughtful])
+  - Expect: 201 Created, JSON with filename, relativePath, absolutePath
+
+  ## Failure: unknown voice
+  - Set voice: "unknown"
+  - Expect: 400, error code UNKNOWN_VOICE
+
+  ## Failure: empty text
+  - Set text: ""
+  - Expect: 400, error code INVALID_REQUEST
+
+  ## Failure: bad project
+  - Set projectId to a non-existent project, or omit projectId
+  - Expect: 400 (UNKNOWN_PROJECT or INVALID_REQUEST)
+}
