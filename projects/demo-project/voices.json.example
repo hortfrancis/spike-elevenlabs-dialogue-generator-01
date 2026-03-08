@@ -1,0 +1,10 @@
+{
+  "doctor": {
+    "voiceId": "YOUR_ELEVENLABS_VOICE_ID",
+    "displayName": "Voice 1"
+  },
+  "naz": {
+    "voiceId": "ANOTHER_ELEVENLABS_VOICE_ID",
+    "displayName": "Voice 2"
+  }
+}

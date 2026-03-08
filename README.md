@@ -29,11 +29,17 @@ npm install
 
 ## Project setup (voices)
 
-Each project has a `voices.json` that maps human-friendly labels to ElevenLabs voice IDs. For the demo project:
+Each project has a `voices.json` that maps human-friendly labels to ElevenLabs voice IDs. This file is **not** committed (it’s in `.gitignore`) so you can use your own voice IDs without leaking them.
 
-**Path:** `projects/demo-project/voices.json`
+**Example project:** `projects/demo-project/` is the included example. To use it:
 
-**Example:**
+1. Copy the example config:
+   ```bash
+   cp projects/demo-project/voices.json.example projects/demo-project/voices.json
+   ```
+2. Edit `projects/demo-project/voices.json` and replace the placeholder voice IDs with your ElevenLabs voice IDs (from the [ElevenLabs Voice Library](https://elevenlabs.io/voice-library) or your account).
+
+**Format of `voices.json`:**
 
 ```json
 {
@@ -48,7 +54,7 @@ Each project has a `voices.json` that maps human-friendly labels to ElevenLabs v
 }
 ```
 
-Create or edit this file for your project; the repo includes a sample for `demo-project`.
+For new projects, create a `projects/<your-project>/` folder, add a `voices.json` (you can copy from `demo-project/voices.json.example`), and add your scenes as needed.
 
 ## Run the server
 
