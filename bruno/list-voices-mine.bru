@@ -1,0 +1,26 @@
+meta {
+  name: List my voices (ElevenLabs)
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3001/voices/mine
+  body: none
+  auth: none
+}
+
+docs {
+  # List my voices (user-created only)
+
+  Returns voices you created (cloned, generated, or professional). Filters GET /voices by category; excludes premade.
+
+  ## Query (optional)
+  - show_legacy: true to include legacy in the upstream fetch (filtering still applies)
+
+  ## Success
+  - Expect: 200 OK, { "voices": [...] }
+
+  ## Failure
+  - Same as List voices (500 if no API key, 502 on ElevenLabs error)
+}
