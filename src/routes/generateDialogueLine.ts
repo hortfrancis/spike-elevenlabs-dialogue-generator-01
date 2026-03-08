@@ -87,7 +87,10 @@ export const generateDialogueLineRoute: FastifyPluginAsync = async (app) => {
       if (!apiKey) {
         request.log.error("ELEVENLABS_API_KEY is not set");
         return reply.status(500).send(
-          apiError("INTERNAL_ERROR", "Server configuration error")
+          apiError(
+            "INTERNAL_ERROR",
+            "ELEVENLABS_API_KEY is not set. Set it in your environment or .env file."
+          )
         );
       }
       const result = await callElevenLabs(

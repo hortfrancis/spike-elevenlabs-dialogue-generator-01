@@ -46,10 +46,30 @@ export async function generateDialogueLine(
 
   if (!res.ok) {
     const text = await res.text();
-    let detail = text;
+    let detail: string = text;
     try {
-      const json = JSON.parse(text) as { detail?: string; message?: string };
-      detail = json.detail ?? json.message ?? text;
+      const json = JSON.parse(text) as {
+        detail?: string | Record<string, unknown>;
+        message?: string | Record<string, unknown>;
+      };
+      const raw =
+        json.detail !== undefined
+          ? json.detail
+          : json.message !== undefined
+            ? json.message
+            : text;
+      if (typeof raw === "string") {
+        detail = raw;
+      } else if (
+        raw !== null &&
+        typeof raw === "object" &&
+        "message" in raw &&
+        typeof (raw as { message: unknown }).message === "string"
+      ) {
+        detail = (raw as { message: string }).message;
+      } else {
+        detail = JSON.stringify(raw);
+      }
     } catch {
       // use raw text
     }
