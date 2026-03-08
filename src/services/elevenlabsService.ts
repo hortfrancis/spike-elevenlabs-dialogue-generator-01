@@ -5,7 +5,8 @@
 
 const ELEVENLABS_BASE = "https://api.elevenlabs.io/v1";
 const DEFAULT_MODEL_ID = "eleven_v3";
-const OUTPUT_FORMAT = "wav_44100";
+/** MP3 44.1kHz 128kbps – API default, works on Creator tier (wav_44100 requires Pro). */
+const OUTPUT_FORMAT = "mp3_44100_128";
 
 export interface GenerateDialogueLineInput {
   voiceId: string;

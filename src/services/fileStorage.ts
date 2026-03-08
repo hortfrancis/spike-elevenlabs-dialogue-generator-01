@@ -14,7 +14,7 @@ function safeVoiceSegment(voice: string): string {
 
 /**
  * Parse existing filenames in the section folder to find the next numeric prefix.
- * Expects names like 001-doctor.wav, 002-naz.wav.
+ * Expects names like 001-doctor.mp3, 002-naz.mp3 (or .wav).
  */
 async function getNextSequenceNumber(
   outputDir: string,
@@ -47,19 +47,21 @@ export interface SaveDialogueResult {
 
 /**
  * Ensure output directory exists, compute next filename, write audio buffer.
+ * @param extension - File extension without dot (e.g. "mp3", "wav"). Default "mp3".
  */
 export async function saveDialogueAudio(
   projectId: string,
   sectionId: string,
   voice: string,
-  audioBuffer: ArrayBuffer
+  audioBuffer: ArrayBuffer,
+  extension: string = "mp3"
 ): Promise<SaveDialogueResult> {
   const outputDir = getDialogueOutputDir(projectId, sectionId);
   await mkdir(outputDir, { recursive: true });
 
   const voiceSegment = safeVoiceSegment(voice);
   const nextNum = await getNextSequenceNumber(outputDir, voiceSegment);
-  const filename = `${String(nextNum).padStart(3, "0")}-${voiceSegment}.wav`;
+  const filename = `${String(nextNum).padStart(3, "0")}-${voiceSegment}.${extension}`;
   const absolutePath = path.join(outputDir, filename);
 
   const buffer = Buffer.from(audioBuffer);

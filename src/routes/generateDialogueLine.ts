@@ -82,6 +82,7 @@ export const generateDialogueLineRoute: FastifyPluginAsync = async (app) => {
     );
 
     let audioBuffer: ArrayBuffer;
+    let contentType: string | undefined;
     try {
       const apiKey = process.env.ELEVENLABS_API_KEY;
       if (!apiKey) {
@@ -98,6 +99,7 @@ export const generateDialogueLineRoute: FastifyPluginAsync = async (app) => {
         { apiKey }
       );
       audioBuffer = result.audioBuffer;
+      contentType = result.contentType;
     } catch (err) {
       if (err instanceof ElevenLabsError) {
         request.log.warn({ statusCode: err.statusCode }, "ElevenLabs API error");
@@ -114,13 +116,18 @@ export const generateDialogueLineRoute: FastifyPluginAsync = async (app) => {
       );
     }
 
+    const extension =
+      contentType?.includes("mpeg") || contentType?.includes("mp3")
+        ? "mp3"
+        : "wav";
     let saveResult;
     try {
       saveResult = await saveDialogueAudio(
         projectId,
         sectionId,
         voice,
-        audioBuffer
+        audioBuffer,
+        extension
       );
     } catch (err) {
       request.log.error({ err, projectId, sectionId }, "File write failed");
