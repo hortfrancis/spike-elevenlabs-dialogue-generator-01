@@ -1,0 +1,27 @@
+meta {
+  name: List project voices
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:3001/projects/demo-project/voices
+  body: none
+  auth: none
+}
+
+docs {
+  # List project voices (voices.json)
+
+  Returns the voice map for a project from projects/<projectId>/voices.json.
+
+  ## Path
+  - projectId: e.g. demo-project (change in URL as needed)
+
+  ## Success
+  - Expect: 200 OK, JSON with voices array: [{ label, voiceId, displayName? }, ...]
+
+  ## Failure: unknown project
+  - Use a non-existent projectId or project without voices.json
+  - Expect: 400, error code UNKNOWN_PROJECT
+}

@@ -1,0 +1,29 @@
+meta {
+  name: List voices (ElevenLabs)
+  type: http
+  seq: 2
+}
+
+get {
+  url: http://localhost:3001/voices
+  body: none
+  auth: none
+}
+
+docs {
+  # List voices (ElevenLabs account)
+
+  Returns all voices available for the configured ELEVENLABS_API_KEY.
+
+  ## Query (optional)
+  - show_legacy: set to true to include legacy premade voices (default: false)
+
+  ## Success
+  - Expect: 200 OK, JSON with voices array (voice_id, name, category, etc.)
+
+  ## Failure: no API key
+  - If ELEVENLABS_API_KEY is not set: 500, error code INTERNAL_ERROR
+
+  ## Failure: invalid key / ElevenLabs error
+  - Expect: 502, error code ELEVENLABS_ERROR
+}

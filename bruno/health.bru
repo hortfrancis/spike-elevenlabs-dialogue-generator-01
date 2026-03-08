@@ -1,0 +1,17 @@
+meta {
+  name: Health
+  type: http
+  seq: 0
+}
+
+get {
+  url: http://localhost:3001/health
+  body: none
+  auth: none
+}
+
+docs {
+  # Health check
+
+  Simple liveness check. Expect: 200 OK, { "ok": true }.
+}
